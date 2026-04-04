@@ -1,0 +1,39 @@
+name: ML Pipeline
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  ml-pipeline:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.14'
+    
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+    
+    - name: Train models
+      run: python train.py
+    
+    - name: Run bias test
+      run: python tests/bias_test.py
+    
+    - name: Run robustness test
+      run: python tests/robustness_test.py
+
+    - name: Run recall test
+      run: python tests/recall_test.py
+    
+    - name: Simulate data
+      run: python simulate_data.py
+    
+    - name: Run drift test
+      run: python tests/drift_test.py

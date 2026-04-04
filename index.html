@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Income Prediction Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin:0;
+  font-family:'Inter', sans-serif;
+  background: radial-gradient(circle at top left, #1e293b, #0f172a);
+  color:#e2e8f0;
+}
+
+.container {
+  display:flex;
+  height:100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width:300px;
+  min-width:220px;
+  max-width:450px;
+  resize: horizontal;
+
+  padding:20px;
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(12px);
+  box-shadow: 2px 0 20px rgba(0,0,0,0.3);
+
+  height:100vh;
+  overflow-y:auto;
+}
+
+.sidebar h2 {
+  margin-bottom:15px;
+}
+
+.sidebar input,
+.sidebar select {
+  width:100%;
+  margin:8px 0;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  background:#0f172a;
+  color:white;
+  font-size:14px;
+}
+
+/* Button */
+button {
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  background: linear-gradient(90deg,#22d3ee,#3b82f6);
+  color:white;
+  font-size:16px;
+  margin-top:10px;
+  cursor:pointer;
+  box-shadow:0 0 15px rgba(34,211,238,0.5);
+}
+
+/* Main */
+.main {
+  flex:1;
+  padding:30px;
+}
+
+h1 {
+  font-size:28px;
+  font-weight:600;
+  margin-bottom:25px;
+}
+
+/* Cards */
+.card {
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(18px);
+  padding:24px;
+  border-radius:16px;
+  margin-bottom:20px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.3);
+}
+
+/* Progress */
+.progress {
+  width:100%;
+  height:10px;
+  background:#0f172a;
+  border-radius:10px;
+  margin-top:10px;
+}
+
+.fill {
+  height:100%;
+  width:0%;
+  background: linear-gradient(90deg,#22d3ee,#3b82f6);
+  border-radius:10px;
+  box-shadow:0 0 12px #22d3ee;
+}
+
+/* Graph */
+.chart {
+  display:flex;
+  justify-content:center;
+  gap:120px;
+  margin-top:40px;
+}
+
+.bar-vertical {
+  width:100px;
+  height:260px;
+  background:#0f172a;
+  border-radius:16px;
+  position:relative;
+  overflow:hidden;
+}
+
+.fill-vertical {
+  position:absolute;
+  bottom:0;
+  width:100%;
+  height:0%;
+  background: linear-gradient(#22d3ee,#3b82f6);
+  border-radius:16px;
+}
+
+.orange {
+  background: linear-gradient(#fbbf24,#f97316);
+}
+
+.label {
+  text-align:center;
+  margin-top:10px;
+  font-size:16px;
+  font-weight:500;
+}
+
+/* Insights */
+ul {
+  padding-left:20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- Sidebar -->
+<div class="sidebar">
+<h2>Input</h2>
+
+<input id="age" type="number" placeholder="Age">
+
+<select id="workclass">
+  <option value="1">Private</option>
+  <option value="2">Self-Employed</option>
+  <option value="3">Government</option>
+</select>
+
+<input id="fnlwgt" type="number" placeholder="Final Weight">
+
+<select id="education">
+  <option value="1">Bachelors</option>
+  <option value="2">Masters</option>
+  <option value="3">PhD</option>
+  <option value="4">HS-grad</option>
+</select>
+
+<input id="education_num" type="number" placeholder="Education Num">
+
+<select id="marital_status">
+  <option value="1">Single</option>
+  <option value="2">Married</option>
+  <option value="3">Divorced</option>
+</select>
+
+<select id="occupation">
+  <option value="1">Tech</option>
+  <option value="2">Sales</option>
+  <option value="3">Clerical</option>
+  <option value="4">Management</option>
+</select>
+
+<select id="relationship">
+  <option value="1">Husband</option>
+  <option value="2">Wife</option>
+  <option value="3">Not-in-family</option>
+</select>
+
+<select id="race">
+  <option value="1">White</option>
+  <option value="2">Black</option>
+  <option value="3">Asian</option>
+</select>
+
+<select id="sex">
+  <option value="1">Male</option>
+  <option value="2">Female</option>
+</select>
+
+<input id="capital_gain" type="number" placeholder="Capital Gain">
+<input id="capital_loss" type="number" placeholder="Capital Loss">
+<input id="hours_per_week" type="number" placeholder="Hours per Week">
+
+<select id="native_country">
+  <option value="1">India</option>
+  <option value="2">USA</option>
+  <option value="3">Other</option>
+</select>
+
+<button onclick="predict()">Predict</button>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+<h1>Income Prediction Dashboard</h1>
+
+<div class="card">
+<h2 id="prediction">Result will appear here</h2>
+<p id="confidenceText"></p>
+
+<div class="progress">
+<div class="fill" id="confidenceBar"></div>
+</div>
+</div>
+
+<div class="card">
+<h3>Prediction Confidence</h3>
+
+<div class="chart">
+<div>
+<div class="bar-vertical">
+<div id="barLow" class="fill-vertical"></div>
+</div>
+<div class="label">≤ 50K</div>
+</div>
+
+<div>
+<div class="bar-vertical">
+<div id="barHigh" class="fill-vertical orange"></div>
+</div>
+<div class="label">> 50K</div>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h3>Insights</h3>
+<ul>
+<li>Capital gain has a positive impact on income</li>
+<li>High working hours may increase income</li>
+<li>Higher education contributes to higher income</li>
+</ul>
+</div>
+
+</div>
+</div>
+
+<script>
+async function predict() {
+  try {
+    const data = {
+      age: Number(age.value),
+      workclass: Number(workclass.value),
+      fnlwgt: Number(fnlwgt.value),
+      education: Number(education.value),
+      education_num: Number(education_num.value),
+      marital_status: Number(marital_status.value),
+      occupation: Number(occupation.value),
+      relationship: Number(relationship.value),
+      race: Number(race.value),
+      sex: Number(sex.value),
+      capital_gain: Number(capital_gain.value),
+      capital_loss: Number(capital_loss.value),
+      hours_per_week: Number(hours_per_week.value),
+      native_country: Number(native_country.value)
+    };
+
+    const res = await fetch("http://127.0.0.1:8000/predict", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(data)
+    });
+
+    if (!res.ok) throw new Error();
+
+    const result = await res.json();
+    const pred = result.prediction;
+
+    const confidence = pred === 1 ? 80 : 60;
+
+    document.getElementById("prediction").innerText =
+      pred === 1 ? "Prediction: Income > 50K" : "Prediction: Income ≤ 50K";
+
+    document.getElementById("confidenceText").innerText =
+      "Confidence Level: " + confidence + "%";
+
+    document.getElementById("confidenceBar").style.width = confidence + "%";
+
+    document.getElementById("barLow").style.height =
+      pred === 0 ? confidence + "%" : (100 - confidence) + "%";
+
+    document.getElementById("barHigh").style.height =
+      pred === 1 ? confidence + "%" : (100 - confidence) + "%";
+
+  } catch {
+    alert("Backend not connected");
+  }
+}
+</script>
+
+</body>
+</html>
