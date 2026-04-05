@@ -1,5 +1,7 @@
 # Income Prediction API
 
+**Live Demo:** [https://income-dashboard-70v8.onrender.com](https://income-dashboard-70v8.onrender.com)
+
 A machine learning pipeline that predicts whether an individual earns more or less than $50K/year, based on the [UCI Adult dataset](https://archive.ics.uci.edu/ml/datasets/adult). Includes model training, experiment tracking, a REST API, and automated model quality tests.
 
 ---
